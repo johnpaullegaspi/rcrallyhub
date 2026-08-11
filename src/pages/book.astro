@@ -1,0 +1,45 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import BookingForm from '../components/BookingForm.astro';
+import Icon from '../components/Icon.astro';
+import { getCollection } from 'astro:content';
+
+const pageEntries = await getCollection('pages');
+const page = pageEntries.find((p) => p.slug === 'book')!;
+const settingsEntries = await getCollection('settings');
+const settings = settingsEntries[0].data;
+---
+<Layout
+  title={page.data.seoTitle || page.data.title}
+  description={page.data.metaDescription || page.data.description || ''}
+  ogImage={page.data.ogImage}
+  breadcrumbs={[{ name: 'Home', url: '/' }, { name: 'Book a Court', url: '/book' }]}
+>
+  <PageHero heading={page.data.heading} subheading={page.data.subheading} description={page.data.description} heroImage={page.data.heroImage} heroImageAlt={page.data.heroImageAlt} compact />
+
+  <section class="py-16 sm:py-20">
+    <div class="container-rc">
+      <div class="max-w-3xl mx-auto mb-10 grid sm:grid-cols-3 gap-4 reveal">
+        <div class="card-surface p-4 text-center">
+          <Icon name="clock" class="w-5 h-5 text-rc-lime mx-auto mb-2" />
+          <p class="text-xs text-rc-silver">{settings.operatingHours}</p>
+        </div>
+        <div class="card-surface p-4 text-center">
+          <Icon name="info" class="w-5 h-5 text-rc-lime mx-auto mb-2" />
+          <p class="text-xs text-rc-silver">Bookings after midnight are fully supported</p>
+        </div>
+        <div class="card-surface p-4 text-center">
+          <Icon name="check" class="w-5 h-5 text-rc-lime mx-auto mb-2" />
+          <p class="text-xs text-rc-silver">Starts as Pending Confirmation</p>
+        </div>
+      </div>
+
+      <BookingForm />
+
+      <div class="max-w-3xl mx-auto mt-10 text-center text-xs text-rc-silver-dark reveal">
+        <p>This is a front-end reservation request demo. See our <a href="/faqs?q=confirmed" class="text-rc-lime underline underline-offset-4">FAQ on confirmation</a> or read the <a href="https://github.com" class="text-rc-lime underline underline-offset-4">README</a> for how to connect a real booking backend via Netlify Functions.</p>
+      </div>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,86 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { getCollection } from 'astro:content';
+
+const pageEntries = await getCollection('pages');
+const page = pageEntries.find((p) => p.slug === 'booking-confirmation')!;
+const settingsEntries = await getCollection('settings');
+const settings = settingsEntries[0].data;
+---
+<Layout title={page.data.seoTitle || page.data.title} description={page.data.metaDescription || ''} noindex>
+  <section class="py-24 sm:py-28 relative overflow-hidden">
+    <div class="absolute inset-0 court-lines-bg opacity-[0.05]"></div>
+    <div class="container-rc relative max-w-2xl mx-auto text-center" id="confirmation-root">
+      <div class="w-20 h-20 mx-auto rounded-full bg-rc-lime/15 border-2 border-rc-lime flex items-center justify-center mb-7 success-pop">
+        <Icon name="check" class="w-9 h-9 text-rc-lime" />
+      </div>
+      <h1 class="section-heading mb-4">{page.data.heading}</h1>
+      <p class="text-rc-silver text-lg mb-10">{page.data.description}</p>
+
+      <div class="card-surface p-7 sm:p-9 text-left" id="confirmation-details">
+        <div class="flex items-center justify-between mb-6">
+          <span class="text-xs uppercase tracking-wide text-rc-silver-dark">Reference Number</span>
+          <span id="conf-reference" class="font-display text-xl text-rc-lime font-bold">—</span>
+        </div>
+        <div class="flex items-center justify-between mb-6">
+          <span class="text-xs uppercase tracking-wide text-rc-silver-dark">Status</span>
+          <span class="px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-300 text-xs font-heading font-bold uppercase">Pending Confirmation</span>
+        </div>
+        <dl id="conf-summary" class="grid sm:grid-cols-2 gap-4 text-sm border-t border-white/10 pt-6"></dl>
+      </div>
+
+      <div class="mt-10 grid sm:grid-cols-2 gap-4">
+        <a href="/" class="btn-secondary" data-ripple>Back to Home</a>
+        <a href={`tel:${settings.contact.mobile.replace(/\s+/g, '')}`} class="btn-primary" data-ripple>Call Us With Questions</a>
+      </div>
+
+      <p class="text-xs text-rc-silver-dark mt-8 max-w-md mx-auto">
+        Your reservation is <strong class="text-rc-white">Pending Confirmation</strong> until our team verifies availability. We'll reach out using your preferred contact method to confirm the details above.
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .success-pop {
+    animation: successPop 0.6s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes successPop {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .success-pop { animation: none; }
+  }
+</style>
+
+<script>
+  try {
+    const raw = sessionStorage.getItem('rc-last-booking');
+    if (raw) {
+      const booking = JSON.parse(raw);
+      const refEl = document.getElementById('conf-reference');
+      if (refEl) refEl.textContent = booking.reference || '—';
+      const summaryEl = document.getElementById('conf-summary');
+      if (summaryEl) {
+        const rows: [string, string][] = [
+          ['Date', booking.dateLabel || '—'],
+          ['Time', booking.timeLabel || '—'],
+          ['Duration', booking.durationLabel || '—'],
+          ['Players', booking.players || '—'],
+          ['Session Type', booking.sessionType || '—'],
+          ['Name', booking.name || '—'],
+          ['Mobile', booking.mobile || '—'],
+          ['Email', booking.email || '—'],
+        ];
+        summaryEl.innerHTML = rows
+          .map(([label, value]) => `<div><dt class="text-rc-silver-dark text-xs uppercase">${label}</dt><dd class="text-rc-white mt-0.5">${value}</dd></div>`)
+          .join('');
+      }
+    }
+  } catch {
+    /* no prior booking in this session — show generic confirmation */
+  }
+</script>
