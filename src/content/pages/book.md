@@ -7,6 +7,6 @@ heroImage: "/images/court/court-net-01.webp"
 heroImageAlt: "Empty RC Rally Hub pickleball court with the branded backdrop and portable net, ready for the next match"
 published: true
 seoTitle: "Book a Pickleball Court | RC Rally Hub Iligan City"
-metaDescription: "Reserve a pickleball court at RC Rally Hub in Iligan City. Choose your date, time, players, and add-ons, then submit your reservation request online."
+metaDescription: "Reserve a pickleball court at RC Rally Hub in Iligan City. Choose your date and time on our secure booking system, then submit your reservation request online."
 ogImage: "/images/court/court-net-01-1200.webp"
 ---

@@ -78,46 +78,36 @@ const { heading, subheading, description, heroImage, heroImageAlt, ctas = [] } =
             <label for="hero-date" class="block text-xs font-heading uppercase tracking-wide text-rc-silver-dark mb-1.5">Date</label>
             <input type="date" id="hero-date" name="date" class="w-full min-h-[44px] rounded-lg bg-white/5 border border-white/15 px-3.5 text-sm text-rc-white focus:outline-none focus:border-rc-lime" required />
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label for="hero-time" class="block text-xs font-heading uppercase tracking-wide text-rc-silver-dark mb-1.5">Start Time</label>
-              <select id="hero-time" name="time" class="w-full min-h-[44px] rounded-lg bg-white/5 border border-white/15 px-3 text-sm text-rc-white focus:outline-none focus:border-rc-lime"></select>
-            </div>
-            <div>
-              <label for="hero-duration" class="block text-xs font-heading uppercase tracking-wide text-rc-silver-dark mb-1.5">Duration</label>
-              <select id="hero-duration" name="duration" class="w-full min-h-[44px] rounded-lg bg-white/5 border border-white/15 px-3 text-sm text-rc-white focus:outline-none focus:border-rc-lime">
-                <option value="1">1 hour</option>
-                <option value="1.5">1.5 hours</option>
-                <option value="2">2 hours</option>
-                <option value="3">3 hours</option>
-              </select>
-            </div>
-          </div>
           <div>
             <label for="hero-players" class="block text-xs font-heading uppercase tracking-wide text-rc-silver-dark mb-1.5">Number of Players</label>
-            <select id="hero-players" name="players" class="w-full min-h-[44px] rounded-lg bg-white/5 border border-white/15 px-3 text-sm text-rc-white focus:outline-none focus:border-rc-lime">
-              <option>2 players</option>
-              <option selected>4 players</option>
-              <option>5–8 players</option>
-              <option>9+ players (group/event)</option>
-            </select>
+            <input
+              type="number"
+              id="hero-players"
+              name="players"
+              min="1"
+              max="50"
+              step="1"
+              value="4"
+              class="w-full min-h-[44px] rounded-lg bg-white/5 border border-white/15 px-3.5 text-sm text-rc-white focus:outline-none focus:border-rc-lime"
+              required
+            />
           </div>
         </div>
 
         <button type="submit" class="btn-primary w-full mt-6" data-ripple>
           Check Availability <Icon name="arrow" class="w-4 h-4" />
         </button>
-        <p class="text-[11px] text-rc-silver-dark mt-3 text-center">We'll take you to the full booking form with your picks pre-filled.</p>
+        <p class="text-[11px] text-rc-silver-dark mt-3 text-center">
+          You'll pick your exact start time and hours on the booking page, based on real-time availability.
+        </p>
       </form>
     </div>
   </div>
 </section>
 
 <script>
-  import { generateTimeSlots } from '../../lib/booking-time';
-
   const dateInput = document.getElementById('hero-date') as HTMLInputElement;
-  const timeSelect = document.getElementById('hero-time') as HTMLSelectElement;
+  const playersInput = document.getElementById('hero-players') as HTMLInputElement;
   const form = document.getElementById('hero-booking-form') as HTMLFormElement;
 
   function todayISO() {
@@ -125,31 +115,21 @@ const { heading, subheading, description, heroImage, heroImageAlt, ctas = [] } =
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
-  function populateSlots(dateISO: string) {
-    timeSelect.innerHTML = '';
-    const slots = generateTimeSlots(dateISO);
-    slots.forEach((slot) => {
-      const opt = document.createElement('option');
-      opt.value = String(slot.index);
-      opt.textContent = slot.startLabel + (slot.isNextCalendarDay ? ' (next day)' : '');
-      timeSelect.appendChild(opt);
-    });
-  }
-
   if (dateInput) {
     dateInput.min = todayISO();
     dateInput.value = todayISO();
-    populateSlots(dateInput.value);
-    dateInput.addEventListener('change', () => populateSlots(dateInput.value || todayISO()));
   }
 
+  // Start time and duration are intentionally NOT collected here — the
+  // booking system shows real, live per-hour availability, and a guess made
+  // on this marketing page could easily be wrong (already booked) by the
+  // time the visitor gets there. Only date and party size are forwarded.
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
     const params = new URLSearchParams();
     params.set('date', dateInput.value || todayISO());
-    params.set('slot', timeSelect.value || '11');
-    params.set('duration', (document.getElementById('hero-duration') as HTMLSelectElement).value);
-    params.set('players', (document.getElementById('hero-players') as HTMLSelectElement).value);
+    const players = Number(playersInput?.value);
+    params.set('players', Number.isInteger(players) && players >= 1 ? String(players) : '4');
     window.location.href = `/book?${params.toString()}`;
   });
 

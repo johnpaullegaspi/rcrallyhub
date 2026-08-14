@@ -1,39 +1,36 @@
 # Netlify Functions — Future Integration Points
 
-This directory is intentionally close to empty in the demo build. RC Rally
-Hub's booking form currently works as a **front-end reservation request**:
-it submits to Netlify Forms (visible under Site → Forms in the Netlify
-dashboard) and shows a `Pending Confirmation` status to the visitor. No
-server-side booking logic exists yet.
+This directory is intentionally close to empty. Booking is **no longer**
+handled on this site — every "Book Now" / "Book a Court" link takes
+visitors to a separately deployed booking system (see the sibling
+`bookingsystem` repo/project), configured via `bookingUrl` in
+`src/content/settings/settings.yml` (also editable from the CMS under
+Settings → "Booking System URL"). That system has its own Next.js API
+routes, Turso database, and admin dashboard — it does not live in this
+repo or deploy through this `netlify.toml`.
 
-When you're ready to wire up a real backend, this is where server-side,
-secret-holding logic belongs — **never** put API keys or database
-credentials in frontend code (anything in `src/`) since that ships to every
-visitor's browser.
+This directory is still here for anything else this site's frontend might
+eventually need a secret-holding backend for. **Never** put API keys or
+database credentials in frontend code (anything in `src/`) since that ships
+to every visitor's browser.
 
 ## Suggested functions to add here
 
-- **`create-booking.ts`** — receive the booking payload, check real
-  availability against a database, write the reservation, and return a
-  proper `Confirmed`/`Pending`/`Rejected` status instead of the client-side
-  demo simulation in `src/lib/client/booking-form.ts`.
-- **`send-confirmation-email.ts`** — call an email provider (Resend,
-  SendGrid, Postmark, etc.) using an API key stored in a Netlify
-  environment variable, triggered after `create-booking` succeeds.
-- **`send-sms-notification.ts`** — same idea via an SMS provider (Semaphore,
-  Twilio, etc.) for the Philippine market.
-- **`check-availability.ts`** — expose a read endpoint the booking form's
-  Step 1 can call instead of the deterministic demo pattern in
-  `src/lib/booking-time.ts` (`isSlotUnavailable`), backed by a real
-  database or calendar.
-- **`sync-calendar.ts`** — push confirmed bookings to Google Calendar /
-  Outlook via a service account, so staff see reservations without opening
-  the CMS or a separate dashboard.
 - **`chatbot-ai.ts`** — a server-side proxy to the OpenAI API (or another
   LLM) for a smarter Rally Assistant. Keep `OPENAI_API_KEY` in Netlify
   environment variables and call it only from here; the current
   `src/lib/client/chatbot.ts` rule-based engine is designed to be swapped
   for a fetch to this endpoint without changing its message-rendering code.
+- **`send-contact-email.ts`** — if you want the contact page to notify an
+  inbox directly instead of relying on Netlify Forms' own notification
+  settings.
+
+If you ever want booking logic to move back into this site instead of the
+separate system, `create-booking.ts` / `check-availability.ts` /
+`send-confirmation-email.ts` would be the natural functions to add — but
+that would mean re-implementing what the `bookingsystem` project's API
+routes already do (real availability checking, double-booking prevention,
+admin approval workflow), so keeping the two separate is the simpler path.
 
 ## Example shape
 

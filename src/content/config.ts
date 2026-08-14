@@ -53,6 +53,11 @@ const settings = defineCollection({
       link: z.string().optional(),
     }).optional(),
     bookingButtonText: z.string().default('Book a Court'),
+    // URL of the separately-deployed booking system (see /bookingsystem in
+    // the sibling repo) — every "Book Now" CTA on this site links out to
+    // this URL instead of hosting a booking form locally. Update this once
+    // the booking system is deployed (e.g. to its Netlify URL).
+    bookingUrl: z.string().default('https://your-booking-system.example.com/book'),
     footer: z.object({
       description: z.string().optional(),
       copyrightName: z.string().optional(),

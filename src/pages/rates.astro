@@ -9,6 +9,9 @@ import { getCollection } from 'astro:content';
 const pageEntries = await getCollection('pages');
 const page = pageEntries.find((p) => p.slug === 'rates')!;
 
+const settingsEntries = await getCollection('settings');
+const bookingUrl = settingsEntries[0].data.bookingUrl;
+
 const rates = (await getCollection('rates')).filter((r) => r.data.published).sort((a, b) => a.data.displayOrder - b.data.displayOrder);
 const policies = await getCollection('policies');
 const bookingRules = policies.find((p) => p.slug === 'booking-rules')!;
@@ -36,6 +39,7 @@ const peakRate = extractNumber(peak?.data.price || '', 350);
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {rates.map((rate, i) => (
           <RateCard
+            id={rate.id === 'off-peak-hourly' ? 'rate-off-peak' : rate.id === 'peak-hourly' ? 'rate-peak' : undefined}
             name={rate.data.name}
             description={rate.data.description}
             price={rate.data.price}
@@ -57,7 +61,7 @@ const peakRate = extractNumber(peak?.data.price || '', 350);
         <p class="eyebrow mb-5 mx-auto w-fit">Try It Yourself</p>
         <h2 class="section-heading">Pricing Calculator</h2>
       </div>
-      <PricingCalculator offPeakRate={offPeakRate} peakRate={peakRate} />
+      <PricingCalculator offPeakRate={offPeakRate} peakRate={peakRate} bookingUrl={bookingUrl} />
     </div>
   </section>
 
@@ -72,9 +76,9 @@ const peakRate = extractNumber(peak?.data.price || '', 350);
         </div>
       </div>
       <div class="reveal space-y-5" data-reveal-delay="100">
-        <div class="card-surface p-6">
+        <div class="card-surface p-6" id="payment-methods-card">
           <h3 class="font-heading font-bold text-rc-white mb-2">Payment Methods</h3>
-          <p class="text-sm text-rc-silver">Accepted payment methods will be confirmed by our team when your booking is finalized. <span class="text-rc-lime/80 text-xs uppercase">(placeholder — update in CMS)</span></p>
+          <p class="text-sm text-rc-silver" id="payment-methods-text">Accepted payment methods will be confirmed by our team when your booking is finalized. <span class="text-rc-lime/80 text-xs uppercase" id="payment-methods-placeholder-note">(placeholder — update in CMS)</span></p>
         </div>
         <div class="card-surface p-6">
           <h3 class="font-heading font-bold text-rc-white mb-2">Cancellations, Rescheduling & Refunds</h3>
@@ -96,4 +100,54 @@ const peakRate = extractNumber(peak?.data.price || '', 350);
       <a href="/contact" class="btn-primary bg-white text-rc-black hover:bg-white/90" data-ripple data-magnetic>Contact Us</a>
     </div>
   </section>
+
+  <!-- Carries bookingUrl into the client script below without breaking Astro's
+       normal module bundling (a `define:vars` script can't use static
+       `import` — it's injected as a raw, unprocessed inline script). -->
+  <span id="rates-live-pricing-config" data-booking-url={bookingUrl} class="hidden" aria-hidden="true"></span>
 </Layout>
+
+<script>
+  import { fetchLivePricing, formatPeso } from '../lib/live-pricing';
+
+  // Swaps the static/CMS-authored off-peak/peak rate cards and payment
+  // methods card for live values from the booking system, once available.
+  // Everything above already renders correctly with no JS and no reachable
+  // booking system — this only ever upgrades that content in place, never
+  // shows an error if the fetch fails.
+  const configEl = document.getElementById('rates-live-pricing-config');
+  const bookingUrl = configEl?.dataset.bookingUrl;
+
+  fetchLivePricing(bookingUrl).then((pricing) => {
+    if (!pricing) return;
+
+    const offPeakCard = document.getElementById('rate-off-peak');
+    const peakCard = document.getElementById('rate-peak');
+    if (offPeakCard) {
+      const priceEl = offPeakCard.querySelector('[data-rate-price]');
+      const noteEl = offPeakCard.querySelector('[data-rate-placeholder-note]');
+      if (priceEl) priceEl.textContent = formatPeso(pricing.offPeakPricePerHour);
+      if (noteEl) noteEl.textContent = '';
+    }
+    if (peakCard) {
+      const priceEl = peakCard.querySelector('[data-rate-price]');
+      const noteEl = peakCard.querySelector('[data-rate-placeholder-note]');
+      if (priceEl) priceEl.textContent = formatPeso(pricing.peakPricePerHour);
+      if (noteEl) noteEl.textContent = '';
+    }
+
+    const paymentText = document.getElementById('payment-methods-text');
+    const paymentNote = document.getElementById('payment-methods-placeholder-note');
+    if (paymentText) {
+      if (pricing.paymentMethod === 'gcash' && (pricing.gcashName || pricing.gcashNumber)) {
+        paymentText.textContent = `We accept GCash. Send to ${[pricing.gcashName, pricing.gcashNumber].filter(Boolean).join(' — ')}. Upload your receipt on the booking confirmation page and we'll verify it before approving.`;
+      } else if (pricing.paymentMethod === 'bank_transfer' && (pricing.bankName || pricing.bankAccountName || pricing.bankAccountNumber)) {
+        const parts = [pricing.bankName, pricing.bankAccountName, pricing.bankAccountNumber].filter(Boolean).join(' — ');
+        paymentText.textContent = `We accept bank transfer. Send to ${parts}. Upload your receipt on the booking confirmation page and we'll verify it before approving.`;
+      } else {
+        paymentText.textContent = 'Accepted payment methods will be confirmed by our team when your booking is finalized.';
+      }
+      if (paymentNote) paymentNote.textContent = '';
+    }
+  });
+</script>

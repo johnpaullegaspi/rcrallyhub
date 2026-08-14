@@ -2,7 +2,7 @@
 
 The official multi-page website for **RC Rally Hub by Garahe**, a covered pickleball venue inside Garahe by Chef Rods Restaurant in Pala-o, Iligan City, Philippines. Built with [Astro](https://astro.build), TypeScript, and Tailwind CSS, content-managed with [Sveltia CMS](https://github.com/sveltia/sveltia-cms), and deployed on [Netlify](https://www.netlify.com).
 
-This is a fully static site — there is no database and no live booking backend yet. The 5‑step booking form collects a request and shows a **"Pending Confirmation"** reference number; a human confirms real bookings by phone/Messenger until a backend is connected (see [Connecting a Real Booking Backend](#connecting-a-real-booking-backend)).
+This site itself is fully static — there is no database here. Real-time booking (availability, double-booking prevention, admin approval) is handled by a separate booking system that every "Book Now" link on this site points to; see [Booking System (Separate Project)](#booking-system-separate-project).
 
 ---
 
@@ -18,7 +18,7 @@ This is a fully static site — there is no database and no live booking backend
 8. [The Midnight-Crossing Booking Schedule](#the-midnight-crossing-booking-schedule)
 9. [Deploying to Netlify](#deploying-to-netlify)
 10. [Netlify Forms](#netlify-forms)
-11. [Connecting a Real Booking Backend](#connecting-a-real-booking-backend)
+11. [Booking System (Separate Project)](#booking-system-separate-project)
 12. [Chatbot ("Rally Assistant")](#chatbot-rally-assistant)
 13. [SEO & Structured Data](#seo--structured-data)
 14. [Accessibility](#accessibility)
@@ -70,7 +70,7 @@ rc-rally-hub/
 │   ├── layouts/Layout.astro      # Base HTML shell, fonts, SEO/meta wiring
 │   ├── lib/
 │   │   ├── booking-time.ts          # Core midnight-crossing time-slot logic
-│   │   └── client/                  # Client-side scripts (booking-form.ts, chatbot.ts)
+│   │   └── client/                  # Client-side scripts (chatbot.ts)
 │   ├── pages/                    # File-based routes (the 15 required pages)
 │   └── styles/global.css
 ```
@@ -122,7 +122,7 @@ Once deployed, open **`https://your-site.netlify.app/admin`** and log in (see au
 - 🎬 **Videos** — Facebook video entries; only the pre-generated `facebook.com/plugins/video.php` **Approved Embed URL** is ever rendered (see [Chatbot](#chatbot-rally-assistant) note on safety below)
 - 💬 **Testimonials** — customer quotes shown in the homepage carousel
 - ❓ **FAQs** — question/answer/category, plus a "use as chatbot answer" toggle
-- 🎾 **Booking Add-ons** — optional extras shown in the booking flow
+- 🎾 **Booking Add-ons** — optional extras shown on the rates page's cost estimator (informational only — the actual booking flow happens on the separate booking system and doesn't include add-ons yet)
 - 🤖 **Rally Assistant Chatbot** — greeting, fallback message, quick replies, contact actions
 - 📜 **Policies** — Privacy, Terms, and Cancellation & Rescheduling body text
 
@@ -191,17 +191,22 @@ Netlify automatically rebuilds and redeploys whenever new commits land on the de
 
 ## Netlify Forms
 
-Both the Contact form (`ContactForm.astro`) and the Book a Court form (`BookingForm.astro`) include a real static `<form data-netlify="true">` in the built HTML, which is what Netlify's form-detection bot requires — this is already wired up and needs no extra configuration. Submissions appear under **Site → Forms** in the Netlify dashboard. To get email notifications for new submissions, go to **Site → Forms → Settings and usage → Add a notification**.
+The Contact form (`ContactForm.astro`) includes a real static `<form data-netlify="true">` in the built HTML, which is what Netlify's form-detection bot requires — this is already wired up and needs no extra configuration. Submissions appear under **Site → Forms** in the Netlify dashboard. To get email notifications for new submissions, go to **Site → Forms → Settings and usage → Add a notification**. (Booking no longer goes through Netlify Forms — see below.)
 
-## Connecting a Real Booking Backend
+## Booking System (Separate Project)
 
-The current booking flow is intentionally front-end-only: it collects a request via Netlify Forms and always shows **"Pending Confirmation"** with a generated reference number — it never claims a slot is confirmed, per design. To make it a real-time system:
+Booking is **not** handled on this site anymore. Every "Book Now" / "Book a Court" link across the site takes visitors to a separately built and deployed booking system (a Next.js + Turso project — see the sibling `bookingsystem` project) with real-time availability, double-booking prevention, and an admin approval dashboard. That system always shows a booking as **Pending** until an admin approves it — it never fakes a "Confirmed" state, matching this site's original design principle.
 
-1. Build a Netlify Function under `netlify/functions/` (a starting `README.md` with integration notes already lives there) that validates and stores incoming bookings — e.g. writing to a database (Airtable, Supabase, a booking SaaS API, or your own backend).
-2. Update `submitBooking()` in `src/lib/client/booking-form.ts` to call your function's endpoint instead of (or in addition to) the Netlify Forms submission.
-3. Keep availability logic (`isSlotUnavailable`, `isDateFullyBooked` in `src/lib/booking-time.ts`) but replace the current deterministic demo/seeded-hash data with a real fetch to your backend so the slot grid reflects actual bookings.
-4. Only flip a booking's displayed status away from "Pending Confirmation" once your backend has actually confirmed it — never fake a "Confirmed" state on the client.
-5. **Never put API keys, secrets, or database credentials in any `.astro` or client-side `.ts` file.** They belong only in Netlify environment variables, read inside a Netlify Function (server-side). See `.env.example` for the documented placeholders.
+**How the two are wired together:**
+
+- `src/content/settings/settings.yml`'s `bookingUrl` field (also editable from the CMS under *Settings → Booking System URL*) holds the booking system's URL. Every nav link, hero CTA, sticky mobile bar, rate card, and the `/book` page's own button read from this one value — update it once (e.g. after deploying the booking system to Netlify) and every CTA on the site follows.
+- `/book` on this site is now a short explainer page (hours, how confirmation works) with a "Continue to Booking" button that opens the booking system in a new tab, so `RC Rally Hub` itself stays open in the visitor's browser.
+- If a visitor used the homepage's "Quick Check" widget to pick a date first, that date is carried through as a `?date=` query parameter so they don't have to re-pick it on the booking system.
+- The booking system's own `/book` and `/book/confirmation` pages link back to this site via its `NEXT_PUBLIC_MARKETING_SITE_URL` environment variable — set that to this site's real URL once both are deployed.
+
+The old front-end-only demo form (`src/components/BookingForm.astro`, `src/lib/client/booking-form.ts`, and the `/booking-confirmation` page that read its `sessionStorage` result) has been removed now that a real backend exists — there's no reason to keep a fake reservation flow alongside a real one. `netlify/functions/` is still here for anything else this site's frontend might need a secret-holding backend for (see that folder's `README.md`).
+
+**Never put API keys, secrets, or database credentials in any `.astro` or client-side `.ts` file in this repo** — those belong in the booking system's own environment variables (see its `.env.example`), never here.
 
 ## Chatbot ("Rally Assistant")
 

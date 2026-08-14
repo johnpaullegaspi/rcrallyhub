@@ -9,8 +9,10 @@ interface Props {
   isPlaceholderPrice: boolean;
   featured?: boolean;
   index?: number;
+  /** Lets a parent page (rates.astro) target this specific card's price/unit text from a client script — e.g. to swap in live pricing. Optional; unused by default. */
+  id?: string;
 }
-const { name, description, price, billingUnit, peakOrOffPeak, features, isPlaceholderPrice, featured = false, index = 0 } = Astro.props;
+const { name, description, price, billingUnit, peakOrOffPeak, features, isPlaceholderPrice, featured = false, index = 0, id } = Astro.props;
 
 const badgeMap: Record<string, string> = {
   peak: 'Peak Hours',
@@ -36,9 +38,12 @@ const badgeMap: Record<string, string> = {
   )}
   <h3 class="font-heading text-xl font-bold text-rc-white mb-2">{name}</h3>
   <p class="text-sm text-rc-silver leading-relaxed mb-5">{description}</p>
-  <div class="mb-5">
-    <p class="font-display text-3xl font-extrabold text-rc-lime leading-tight">{price}</p>
-    <p class="text-xs text-rc-silver-dark">{billingUnit}{isPlaceholderPrice ? ' · placeholder rate' : ''}</p>
+  <div class="mb-5" id={id}>
+    <p class="font-display text-3xl font-extrabold text-rc-lime leading-tight" data-rate-price>{price}</p>
+    <p class="text-xs text-rc-silver-dark" data-rate-unit>
+      {billingUnit}
+      <span data-rate-placeholder-note>{isPlaceholderPrice ? ' · placeholder rate' : ''}</span>
+    </p>
   </div>
   {features.length > 0 && (
     <ul class="space-y-2.5 mb-7 flex-1">

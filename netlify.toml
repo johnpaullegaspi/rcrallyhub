@@ -44,7 +44,14 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data: https:; media-src 'self' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://unpkg.com; frame-src https://www.facebook.com https://www.google.com; connect-src 'self'; base-uri 'self'; form-action 'self';"
+    # connect-src includes the booking system's origin so the Rates page can
+    # fetch live pricing client-side (see src/lib/live-pricing.ts). This is
+    # still the placeholder domain from src/content/settings/settings.yml's
+    # `bookingUrl` — once the booking system is deployed to its real domain,
+    # update BOTH that CMS field and this origin to match, or the live-pricing
+    # fetch will be silently blocked by the browser (it fails closed, so the
+    # page still renders fine with static placeholder content either way).
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data: https:; media-src 'self' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://unpkg.com; frame-src https://www.facebook.com https://www.google.com; connect-src 'self' https://your-booking-system.example.com; base-uri 'self'; form-action 'self';"
 
 # Admin should never be indexed and should always fetch fresh (CMS + config).
 [[headers]]
