@@ -4,11 +4,16 @@
 # Sveltia CMS is a Decap-CMS-compatible admin UI, so this file uses the same
 # well-documented config format. See README.md → "Sveltia CMS Setup" for how
 # to connect your GitHub repository and authorize CMS users.
+#
+# Collections below are ordered and labeled to mirror the site's own nav
+# (Home → Book a Court → Rates → Events → Gallery → Videos → About → FAQs →
+# Contact), with each page's own editable content grouped right after it, so
+# editing "feels" per-page even though Sveltia's collection list is flat.
 # =============================================================================
 
 backend:
   name: github
-  repo: YOUR-GITHUB-USERNAME/rc-rally-hub # <-- update after pushing to GitHub
+  repo: johnpaullegaspi/rcrallyhub # <-- update after pushing to GitHub
   branch: main
   # Auth uses Netlify's built-in OAuth provider for Git-based CMS tools
   # (Site settings → Access control → OAuth in the Netlify dashboard).
@@ -104,34 +109,87 @@ collections:
               - { label: "Default Social Share Image", name: ogImage, widget: image, required: false }
 
   # ---------------------------------------------------------------------
+  # One row per page, ordered exactly like the site's nav (plus the legal/
+  # utility pages at the end) — heading, hero image, SEO, and body copy for
+  # each page live here.
   - name: pages
-    label: "📄 Pages"
-    folder: "src/content/pages"
-    identifier_field: title
-    fields:
-      - { label: "Page Title (internal)", name: title, widget: string }
-      - { label: "Heading (H1)", name: heading, widget: string }
-      - { label: "Subheading", name: subheading, widget: string, required: false }
-      - { label: "Description", name: description, widget: text, required: false }
-      - { label: "Hero Image", name: heroImage, widget: image, required: false }
-      - { label: "Hero Image Alt Text", name: heroImageAlt, widget: string, required: false }
-      - label: "Call-to-Action Buttons"
-        name: ctas
-        widget: list
-        required: false
-        fields:
-          - { label: "Label", name: label, widget: string }
-          - { label: "Link", name: href, widget: string }
-          - { label: "Style", name: style, widget: select, options: [primary, secondary, ghost], default: primary }
-      - { label: "Published", name: published, widget: boolean, default: true }
-      - { label: "SEO Title", name: seoTitle, widget: string, required: false }
-      - { label: "Meta Description", name: metaDescription, widget: text, required: false }
-      - { label: "Open Graph / Social Share Image", name: ogImage, widget: image, required: false }
-      - { label: "Body Content (used on About, Privacy, Terms, etc.)", name: body, widget: markdown, required: false }
+    label: "📄 Pages (Heading, Hero, SEO)"
+    files:
+      - name: home
+        label: "🏠 Home"
+        file: "src/content/pages/home.md"
+        fields: &pageFields
+          - { label: "Page Title (internal)", name: title, widget: string }
+          - { label: "Heading (H1)", name: heading, widget: string }
+          - { label: "Subheading", name: subheading, widget: string, required: false }
+          - { label: "Description", name: description, widget: text, required: false }
+          - { label: "Hero Image", name: heroImage, widget: image, required: false }
+          - { label: "Hero Image Alt Text", name: heroImageAlt, widget: string, required: false }
+          - label: "Call-to-Action Buttons"
+            name: ctas
+            widget: list
+            required: false
+            fields:
+              - { label: "Label", name: label, widget: string }
+              - { label: "Link", name: href, widget: string }
+              - { label: "Style", name: style, widget: select, options: [primary, secondary, ghost], default: primary }
+          - { label: "Published", name: published, widget: boolean, default: true }
+          - { label: "SEO Title", name: seoTitle, widget: string, required: false }
+          - { label: "Meta Description", name: metaDescription, widget: text, required: false }
+          - { label: "Open Graph / Social Share Image", name: ogImage, widget: image, required: false }
+          - { label: "Body Content (used on About, Privacy, Terms, etc.)", name: body, widget: markdown, required: false }
+      - name: book
+        label: "📅 Book a Court"
+        file: "src/content/pages/book.md"
+        fields: *pageFields
+      - name: rates
+        label: "💰 Rates"
+        file: "src/content/pages/rates.md"
+        fields: *pageFields
+      - name: events
+        label: "🏆 Events"
+        file: "src/content/pages/events.md"
+        fields: *pageFields
+      - name: gallery
+        label: "🖼️ Gallery"
+        file: "src/content/pages/gallery.md"
+        fields: *pageFields
+      - name: videos
+        label: "🎬 Videos"
+        file: "src/content/pages/videos.md"
+        fields: *pageFields
+      - name: about
+        label: "🙋 About"
+        file: "src/content/pages/about.md"
+        fields: *pageFields
+      - name: faqs
+        label: "❓ FAQs"
+        file: "src/content/pages/faqs.md"
+        fields: *pageFields
+      - name: contact
+        label: "☎️ Contact"
+        file: "src/content/pages/contact.md"
+        fields: *pageFields
+      - name: privacy
+        label: "📜 Privacy Policy"
+        file: "src/content/pages/privacy.md"
+        fields: *pageFields
+      - name: terms
+        label: "📜 Terms of Service"
+        file: "src/content/pages/terms.md"
+        fields: *pageFields
+      - name: cancellation-policy
+        label: "📜 Cancellation Policy"
+        file: "src/content/pages/cancellation-policy.md"
+        fields: *pageFields
+      - name: 404
+        label: "🚫 404 Not Found"
+        file: "src/content/pages/404.md"
+        fields: *pageFields
 
   # ---------------------------------------------------------------------
   - name: homeContent
-    label: "🏠 Home Page Sections"
+    label: "🏠 Home Page — Sections"
     files:
       - name: home
         label: "Highlights, Why Us, Stats & Booking Steps"
@@ -169,38 +227,8 @@ collections:
               - { label: "Description", name: description, widget: text }
 
   # ---------------------------------------------------------------------
-  - name: aboutContent
-    label: "🙋 About Page Sections"
-    files:
-      - name: about
-        label: "Values, Team & Partners"
-        file: "src/content/aboutContent/about.yml"
-        fields:
-          - label: "Community Values"
-            name: values
-            widget: list
-            fields:
-              - { label: "Title", name: title, widget: string }
-              - { label: "Description", name: description, widget: text }
-          - label: "Team & Staff"
-            name: team
-            widget: list
-            fields:
-              - { label: "Name", name: name, widget: string }
-              - { label: "Role", name: role, widget: string }
-              - { label: "Photo", name: photo, widget: image, required: false }
-              - { label: "Is Placeholder?", name: isPlaceholder, widget: boolean, default: true }
-          - label: "Community Partners"
-            name: partners
-            widget: list
-            fields:
-              - { label: "Name", name: name, widget: string }
-              - { label: "Description", name: description, widget: text, required: false }
-              - { label: "Logo", name: logo, widget: image, required: false }
-
-  # ---------------------------------------------------------------------
   - name: rates
-    label: "💰 Rates & Packages"
+    label: "💰 Rates Page — Packages"
     folder: "src/content/rates"
     identifier_field: name
     summary: "{{name}} — {{price}}"
@@ -218,8 +246,22 @@ collections:
       - { label: "Published", name: published, widget: boolean, default: true }
 
   # ---------------------------------------------------------------------
+  - name: addons
+    label: "🎾 Rates Page — Booking Add-ons"
+    folder: "src/content/addons"
+    identifier_field: name
+    fields:
+      - { label: "Name", name: name, widget: string }
+      - { label: "Description", name: description, widget: text, required: false }
+      - { label: "Price (display text)", name: price, widget: string }
+      - { label: "Unit", name: unit, widget: string, default: "per session" }
+      - { label: "Icon", name: icon, widget: select, options: [paddle, ball, whistle, sparkles] }
+      - { label: "Display Order", name: displayOrder, widget: number, value_type: int, default: 0 }
+      - { label: "Published", name: published, widget: boolean, default: true }
+
+  # ---------------------------------------------------------------------
   - name: events
-    label: "🏆 Tournaments & Events"
+    label: "🏆 Events Page — Tournaments & Events"
     folder: "src/content/events"
     identifier_field: title
     summary: "{{title}} — {{date}}"
@@ -248,7 +290,7 @@ collections:
 
   # ---------------------------------------------------------------------
   - name: gallery
-    label: "🖼️ Gallery"
+    label: "🖼️ Gallery Page — Photos"
     folder: "src/content/gallery"
     identifier_field: title
     summary: "{{title}} ({{category}})"
@@ -266,7 +308,7 @@ collections:
 
   # ---------------------------------------------------------------------
   - name: videos
-    label: "🎬 Videos (Facebook Reels)"
+    label: "🎬 Videos Page — Videos (Facebook)"
     folder: "src/content/videos"
     identifier_field: title
     fields:
@@ -276,7 +318,7 @@ collections:
       - label: "Approved Embed URL"
         name: approvedEmbedUrl
         widget: string
-        hint: "MUST start with https://www.facebook.com/plugins/video.php — generate at https://developers.facebook.com/docs/plugins/embedded-video-player. The site only renders embeds from this exact domain for safety."
+        hint: "MUST start with https://www.facebook.com/plugins/video.php — generate at https://developers.facebook.com/docs/plugins/embedded-video-player. The site only renders embeds from this exact domain for safety. Autoplay is applied automatically when the visitor clicks play — you do not need to add &autoplay=true yourself."
       - { label: "Poster / Thumbnail Image", name: posterImage, widget: image }
       - { label: "Poster Alt Text", name: posterImageAlt, widget: string, required: false }
       - { label: "Category", name: category, widget: string, default: "Highlights" }
@@ -286,8 +328,38 @@ collections:
       - { label: "Published", name: published, widget: boolean, default: true }
 
   # ---------------------------------------------------------------------
+  - name: aboutContent
+    label: "🙋 About Page — Sections"
+    files:
+      - name: about
+        label: "Values, Team & Partners"
+        file: "src/content/aboutContent/about.yml"
+        fields:
+          - label: "Community Values"
+            name: values
+            widget: list
+            fields:
+              - { label: "Title", name: title, widget: string }
+              - { label: "Description", name: description, widget: text }
+          - label: "Team & Staff"
+            name: team
+            widget: list
+            fields:
+              - { label: "Name", name: name, widget: string }
+              - { label: "Role", name: role, widget: string }
+              - { label: "Photo", name: photo, widget: image, required: false }
+              - { label: "Is Placeholder?", name: isPlaceholder, widget: boolean, default: true }
+          - label: "Community Partners"
+            name: partners
+            widget: list
+            fields:
+              - { label: "Name", name: name, widget: string }
+              - { label: "Description", name: description, widget: text, required: false }
+              - { label: "Logo", name: logo, widget: image, required: false }
+
+  # ---------------------------------------------------------------------
   - name: testimonials
-    label: "💬 Testimonials"
+    label: "💬 Testimonials (Home & About)"
     folder: "src/content/testimonials"
     identifier_field: customerName
     summary: "{{customerName}} — {{customerType}}"
@@ -303,7 +375,7 @@ collections:
 
   # ---------------------------------------------------------------------
   - name: faqs
-    label: "❓ FAQs"
+    label: "❓ FAQs Page — Questions"
     folder: "src/content/faqs"
     identifier_field: question
     fields:
@@ -315,22 +387,8 @@ collections:
       - { label: "Use as Chatbot Answer", name: useAsChatbotAnswer, widget: boolean, default: true }
 
   # ---------------------------------------------------------------------
-  - name: addons
-    label: "🎾 Booking Add-ons"
-    folder: "src/content/addons"
-    identifier_field: name
-    fields:
-      - { label: "Name", name: name, widget: string }
-      - { label: "Description", name: description, widget: text, required: false }
-      - { label: "Price (display text)", name: price, widget: string }
-      - { label: "Unit", name: unit, widget: string, default: "per session" }
-      - { label: "Icon", name: icon, widget: select, options: [paddle, ball, whistle, sparkles] }
-      - { label: "Display Order", name: displayOrder, widget: number, value_type: int, default: 0 }
-      - { label: "Published", name: published, widget: boolean, default: true }
-
-  # ---------------------------------------------------------------------
   - name: chatbot
-    label: "🤖 Rally Assistant Chatbot"
+    label: "🤖 Rally Assistant Chatbot (Site-Wide)"
     files:
       - name: chatbot
         label: "Chatbot Settings"
@@ -358,7 +416,7 @@ collections:
 
   # ---------------------------------------------------------------------
   - name: policies
-    label: "📜 Policies"
+    label: "📜 Policies (Privacy, Terms, Cancellation)"
     folder: "src/content/policies"
     identifier_field: title
     fields:
