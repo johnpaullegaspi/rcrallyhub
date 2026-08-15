@@ -13,7 +13,7 @@
 
 backend:
   name: github
-  repo: johnpaullegaspi/rcrallyhub # <-- update after pushing to GitHub
+  repo: YOUR-GITHUB-USERNAME/rc-rally-hub # <-- update after pushing to GitHub
   branch: main
   # Auth uses Netlify's built-in OAuth provider for Git-based CMS tools
   # (Site settings → Access control → OAuth in the Netlify dashboard).
@@ -182,7 +182,7 @@ collections:
         label: "📜 Cancellation Policy"
         file: "src/content/pages/cancellation-policy.md"
         fields: *pageFields
-      - name: 404
+      - name: "404"
         label: "🚫 404 Not Found"
         file: "src/content/pages/404.md"
         fields: *pageFields
