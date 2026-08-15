@@ -13,7 +13,7 @@
 
 backend:
   name: github
-  repo: johnpaullegaspi/rc-rally-hub # <-- update after pushing to GitHub
+  repo: johnpaullegaspi/rcrallyhub # <-- update after pushing to GitHub
   branch: main
   # Auth uses Netlify's built-in OAuth provider for Git-based CMS tools
   # (Site settings → Access control → OAuth in the Netlify dashboard).
