@@ -8,17 +8,17 @@ operatingHours: Monday to Sunday, 6:00 AM – 3:00 AM
 operatingHoursStart: 06:00
 operatingHoursEnd: 03:00
 contact:
-  mobile: 0917 555 7288
-  mobileIsDummy: true
-  email: play@rcrallyhub.com
-  emailIsDummy: true
-  facebook: facebook.com/RCRallyHub
-  facebookIsDummy: true
-  messenger: https://m.me/RCRallyHub
+  mobile: 0917 894 7367
+  mobileIsDummy: false
+  email: inquiry@rcrallyhub.com
+  emailIsDummy: false
+  facebook: https://www.facebook.com/profile.php?id=61591134029436
+  facebookIsDummy: false
+  messenger: https://www.messenger.com/t/1102300462976840
   mapEmbedUrl: https://www.google.com/maps?q=%2337+Seminary+Drive%2C+Pala-o%2C+Iligan+City%2C+Philippines+9200&output=embed
   mapUrl: https://www.google.com/maps/search/?api=1&query=%2337+Seminary+Drive%2C+Pala-o%2C+Iligan+City%2C+Philippines+9200
 social:
-  facebook: https://facebook.com/RCRallyHub
+  facebook: https://www.facebook.com/profile.php?id=61591134029436
   instagram: ''
   tiktok: ''
   youtube: ''
