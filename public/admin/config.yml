@@ -46,6 +46,7 @@ collections:
   # ---------------------------------------------------------------------
   - name: settings
     label: "🏓 Global Settings"
+    icon: settings
     files:
       - name: settings
         label: "Business Settings"
@@ -114,6 +115,7 @@ collections:
   # each page live here.
   - name: pages
     label: "📄 Pages (Heading, Hero, SEO)"
+    icon: description
     files:
       - name: home
         label: "🏠 Home"
@@ -190,6 +192,7 @@ collections:
   # ---------------------------------------------------------------------
   - name: homeContent
     label: "🏠 Home Page — Sections"
+    icon: home
     files:
       - name: home
         label: "Highlights, Why Us, Stats & Booking Steps"
@@ -229,7 +232,10 @@ collections:
   # ---------------------------------------------------------------------
   - name: rates
     label: "💰 Rates Page — Packages"
+    icon: payments
     folder: "src/content/rates"
+    extension: yml
+    format: yaml
     identifier_field: name
     summary: "{{name}} — {{price}}"
     fields:
@@ -248,7 +254,10 @@ collections:
   # ---------------------------------------------------------------------
   - name: addons
     label: "🎾 Rates Page — Booking Add-ons"
+    icon: add_circle
     folder: "src/content/addons"
+    extension: yml
+    format: yaml
     identifier_field: name
     fields:
       - { label: "Name", name: name, widget: string }
@@ -262,6 +271,7 @@ collections:
   # ---------------------------------------------------------------------
   - name: events
     label: "🏆 Events Page — Tournaments & Events"
+    icon: emoji_events
     folder: "src/content/events"
     identifier_field: title
     summary: "{{title}} — {{date}}"
@@ -291,7 +301,10 @@ collections:
   # ---------------------------------------------------------------------
   - name: gallery
     label: "🖼️ Gallery Page — Photos"
+    icon: photo_library
     folder: "src/content/gallery"
+    extension: yml
+    format: yaml
     identifier_field: title
     summary: "{{title}} ({{category}})"
     fields:
@@ -309,7 +322,10 @@ collections:
   # ---------------------------------------------------------------------
   - name: videos
     label: "🎬 Videos Page — Videos (Facebook)"
+    icon: videocam
     folder: "src/content/videos"
+    extension: yml
+    format: yaml
     identifier_field: title
     fields:
       - { label: "Title", name: title, widget: string }
@@ -330,6 +346,7 @@ collections:
   # ---------------------------------------------------------------------
   - name: aboutContent
     label: "🙋 About Page — Sections"
+    icon: info
     files:
       - name: about
         label: "Values, Team & Partners"
@@ -360,7 +377,10 @@ collections:
   # ---------------------------------------------------------------------
   - name: testimonials
     label: "💬 Testimonials (Home & About)"
+    icon: reviews
     folder: "src/content/testimonials"
+    extension: yml
+    format: yaml
     identifier_field: customerName
     summary: "{{customerName}} — {{customerType}}"
     fields:
@@ -376,7 +396,10 @@ collections:
   # ---------------------------------------------------------------------
   - name: faqs
     label: "❓ FAQs Page — Questions"
+    icon: quiz
     folder: "src/content/faqs"
+    extension: yml
+    format: yaml
     identifier_field: question
     fields:
       - { label: "Question", name: question, widget: string }
@@ -389,6 +412,7 @@ collections:
   # ---------------------------------------------------------------------
   - name: chatbot
     label: "🤖 Rally Assistant Chatbot (Site-Wide)"
+    icon: smart_toy
     files:
       - name: chatbot
         label: "Chatbot Settings"
@@ -417,6 +441,7 @@ collections:
   # ---------------------------------------------------------------------
   - name: policies
     label: "📜 Policies (Privacy, Terms, Cancellation)"
+    icon: policy
     folder: "src/content/policies"
     identifier_field: title
     fields:
