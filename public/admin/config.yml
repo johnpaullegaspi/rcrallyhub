@@ -32,7 +32,7 @@ logo_url: /images/logo/rc-rally-hub-logo-256.webp
 media_folder: "public/images/uploads"
 public_folder: "/images/uploads"
 
-publish_mode: editorial_workflow
+publish_mode: simple
 
 slug:
   encoding: "ascii"
